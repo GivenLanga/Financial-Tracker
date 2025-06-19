@@ -1,20 +1,55 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosInstance from "../utils/axiosInstance";
+
+// Thunk to fetch all transactions from backend
+export const fetchTransactions = createAsyncThunk(
+  "transactions/fetchAll",
+  async (_, thunkAPI) => {
+    const res = await axiosInstance.get("/api/transactions");
+    return res.data;
+  }
+);
+
+// Use an object for initialState to support loading/loaded/items
+const initialState = {
+  items: [],
+  loading: false,
+  loaded: false,
+};
 
 const transactionSlice = createSlice({
   name: "transactions",
-  initialState: [],
+  initialState,
   reducers: {
-    setTransactions: (state, action) => action.payload,
+    setTransactions: (state, action) => {
+      state.items = action.payload;
+      state.loaded = true;
+    },
     addTransaction: (state, action) => {
-      state.push(action.payload);
+      state.items.push(action.payload);
     },
     updateTransaction: (state, action) => {
-      const idx = state.findIndex((t) => t._id === action.payload._id);
-      if (idx !== -1) state[idx] = action.payload;
+      const idx = state.items.findIndex((t) => t._id === action.payload._id);
+      if (idx !== -1) state.items[idx] = action.payload;
     },
     deleteTransaction: (state, action) => {
-      return state.filter((t) => t._id !== action.payload);
+      state.items = state.items.filter((t) => t._id !== action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTransactions.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchTransactions.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.loading = false;
+        state.loaded = true;
+      })
+      .addCase(fetchTransactions.rejected, (state) => {
+        state.loading = false;
+        state.loaded = false;
+      });
   },
 });
 

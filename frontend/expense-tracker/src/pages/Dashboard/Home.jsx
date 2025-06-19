@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../components/Layouts/DashboardLayout";
-import { LuHandCoins, LuWalletMinimal } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
+import { LuWalletMinimal, LuHandCoins } from "react-icons/lu";
 import { FaPiggyBank, FaBullseye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import InfoCard from "../../components/Cards/InfoCard";
@@ -53,6 +53,70 @@ const EmptyState = ({ icon, title, subtitle }) => (
   </div>
 );
 
+const useInView = (options = {}) => {
+  const ref = useRef();
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new window.IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      options
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [ref, options]);
+
+  return [ref, inView];
+};
+
+const FadeInCard = ({ children, delay = 0 }) => {
+  const [ref, inView] = useInView({ threshold: 0.15 });
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "none" : "translateY(40px)",
+        transition: `opacity 0.6s ${delay}ms cubic-bezier(.4,0,.2,1), transform 0.6s ${delay}ms cubic-bezier(.4,0,.2,1)`,
+        willChange: "opacity, transform",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const financialCardThemes = [
+  {
+    label: "Total Balance",
+    icon: <IoMdCard />,
+    gradient: "linear-gradient(135deg, #f8fafc 0%, #dbeafe 100%)",
+    border: "2.5px solid #a855f7",
+    shadow: "0 4px 24px 0 rgba(34,197,94,0.10)",
+    color: "text-primary",
+    ring: "ring-2 ring-primary/20",
+  },
+  {
+    label: "Total Income",
+    icon: <LuWalletMinimal />,
+    gradient: "linear-gradient(135deg, #e0f7fa 0%, #a7ffeb 100%)",
+    border: "2.5px solid #22c55e",
+    shadow: "0 4px 24px 0 rgba(34,197,94,0.13)",
+    color: "text-green-700",
+    ring: "ring-2 ring-green-200",
+  },
+  {
+    label: "Total Expenses",
+    icon: <LuHandCoins />,
+    gradient: "linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)",
+    border: "2.5px solid #ef4444",
+    shadow: "0 4px 24px 0 rgba(239,68,68,0.13)",
+    color: "text-red-600",
+    ring: "ring-2 ring-red-200",
+  },
+];
+
 const Home = ({ goals, setGoals, savings, setSavings }) => {
   useUserAuth();
   const navigate = useNavigate();
@@ -97,152 +161,211 @@ const Home = ({ goals, setGoals, savings, setSavings }) => {
     <DashboardLayout activeMenu="Dashboard">
       <div className="my-5 mx-auto">
         {/* Greeting and avatar */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xl">
-            {userName ? userName[0].toUpperCase() : <IoMdCard />}
-          </div>
-          <div>
-            <div className="text-lg font-semibold text-gray-900">
-              Welcome{userName && `, ${userName}`}!
+        <FadeInCard delay={0}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xl">
+              {userName ? userName[0].toUpperCase() : <IoMdCard />}
             </div>
-            <div className="text-xs text-gray-500">
-              Here’s your financial dashboard.
+            <div>
+              <div className="text-lg font-semibold text-gray-900">
+                Welcome{userName && `, ${userName}`}!
+              </div>
+              <div className="text-xs text-gray-500">
+                Here’s your financial dashboard.
+              </div>
             </div>
           </div>
-        </div>
+        </FadeInCard>
 
-        {/* Info cards */}
+        {/* Financial Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <InfoCard
-            icon={<IoMdCard />}
-            label="Total Balance"
-            value={addThousandsSeparator(dashboardData?.totalBalance || 0)}
-            color="bg-primary"
-          />
-          <InfoCard
-            icon={<LuWalletMinimal />}
-            label="Total Income"
-            value={addThousandsSeparator(dashboardData?.totalIncome || 0)}
-            color="bg-orange-500"
-          />
-          <InfoCard
-            icon={<LuHandCoins />}
-            label="Total Expenses"
-            value={addThousandsSeparator(dashboardData?.totalExpenses || 0)}
-            color="bg-red-500"
-          />
+          {[
+            {
+              ...financialCardThemes[0],
+              value: addThousandsSeparator(dashboardData?.totalBalance || 0),
+            },
+            {
+              ...financialCardThemes[1],
+              value: addThousandsSeparator(dashboardData?.totalIncome || 0),
+            },
+            {
+              ...financialCardThemes[2],
+              value: addThousandsSeparator(dashboardData?.totalExpenses || 0),
+            },
+          ].map((card, idx) => (
+            <div
+              key={card.label}
+              className={`rounded-2xl p-6 flex flex-col items-center justify-center shadow-xl ${card.ring}`}
+              style={{
+                background: card.gradient,
+                border: card.border,
+                boxShadow: card.shadow,
+                minHeight: 140,
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                className={`mb-2 text-3xl ${card.color}`}
+                style={{
+                  filter: "drop-shadow(0 2px 8px rgba(168,85,247,0.10))",
+                }}
+              >
+                {card.icon}
+              </div>
+              <div className="text-xs uppercase tracking-widest font-semibold text-gray-500 mb-1">
+                {card.label}
+              </div>
+              <div
+                className={`text-2xl font-bold ${card.color} tracking-tight`}
+                style={{
+                  letterSpacing: "-0.01em",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                R{card.value}
+              </div>
+              {/* Decorative SVG for financial theme */}
+              <svg
+                width="100"
+                height="40"
+                viewBox="0 0 100 40"
+                fill="none"
+                className="absolute bottom-0 right-0 opacity-20"
+                style={{ zIndex: 0 }}
+              >
+                <ellipse
+                  cx="80"
+                  cy="35"
+                  rx="30"
+                  ry="8"
+                  fill={
+                    idx === 0 ? "#a855f7" : idx === 1 ? "#22c55e" : "#ef4444"
+                  }
+                />
+              </svg>
+            </div>
+          ))}
         </div>
 
         {/* Main dashboard grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          {/* 1st row: Recent Transactions & Financial Overview */}
-          <RecentTransactions
-            transactions={dashboardData?.recentTransactions}
-            onSeeMore={() => navigate("/expense")}
-          />
-
-          <FinanceOverview
-            totalBalance={dashboardData?.totalBalance || 0}
-            totalIncome={dashboardData?.totalIncome || 0}
-            totalExpense={dashboardData?.totalExpenses || 0}
-          />
-
-          {/* 2nd row: Savings & Goals */}
-          <div
-            className="card transition-transform duration-300"
-            style={cardStyle}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 16px 48px 0 rgba(109,40,217,0.18), 0 4px 24px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)";
-              e.currentTarget.style.transform = "scale(1.022)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
-            <div style={borderStyle} />
-            <div className="flex items-center gap-2 mb-3">
-              <FaPiggyBank className="text-2xl text-purple-400" />
-              <span className="text-lg font-semibold text-gray-800">
-                Savings
-              </span>
-            </div>
-            <SavingsOverview
-              savings={savings}
-              onAddSaving={(amt) => setSavings(savings + amt)}
+          <FadeInCard delay={0}>
+            <RecentTransactions
+              transactions={dashboardData?.recentTransactions}
+              onSeeMore={() => navigate("/expense")}
             />
-            {savings === 0 && (
-              <EmptyState
-                icon={<FaPiggyBank />}
-                title="No savings yet"
-                subtitle="Start saving to see your progress here."
+          </FadeInCard>
+          <FadeInCard delay={100}>
+            <FinanceOverview
+              totalBalance={dashboardData?.totalBalance || 0}
+              totalIncome={dashboardData?.totalIncome || 0}
+              totalExpense={dashboardData?.totalExpenses || 0}
+            />
+          </FadeInCard>
+          <FadeInCard delay={200}>
+            <div
+              className="card transition-transform duration-300"
+              style={cardStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 16px 48px 0 rgba(109,40,217,0.18), 0 4px 24px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)";
+                e.currentTarget.style.transform = "scale(1.022)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+            >
+              <div style={borderStyle} />
+              <div className="flex items-center gap-2 mb-3">
+                <FaPiggyBank className="text-2xl text-purple-400" />
+                <span className="text-lg font-semibold text-gray-800">
+                  Savings
+                </span>
+              </div>
+              <SavingsOverview
+                savings={savings}
+                onAddSaving={(amt) => setSavings(savings + amt)}
               />
-            )}
-            <style>
-              {`
-                @keyframes dashboard-card-border {
-                  0% { filter: blur(2.5px) hue-rotate(0deg);}
-                  100% { filter: blur(2.5px) hue-rotate(360deg);}
-                }
-              `}
-            </style>
-          </div>
-
-          <div
-            className="card transition-transform duration-300"
-            style={cardStyle}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 16px 48px 0 rgba(109,40,217,0.18), 0 4px 24px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)";
-              e.currentTarget.style.transform = "scale(1.022)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
-            <div style={borderStyle} />
-            <div className="flex items-center gap-2 mb-3">
-              <FaBullseye className="text-2xl text-yellow-400" />
-              <span className="text-lg font-semibold text-gray-800">
-                Financial Goals
-              </span>
+              {savings === 0 && (
+                <EmptyState
+                  icon={<FaPiggyBank />}
+                  title="No savings yet"
+                  subtitle="Start saving to see your progress here."
+                />
+              )}
+              <style>
+                {`
+                  @keyframes dashboard-card-border {
+                    0% { filter: blur(2.5px) hue-rotate(0deg);}
+                    100% { filter: blur(2.5px) hue-rotate(360deg);}
+                  }
+                `}
+              </style>
             </div>
-            <GoalsOverview goals={goals} setGoals={setGoals} />
-            <style>
-              {`
-                @keyframes dashboard-card-border {
-                  0% { filter: blur(2.5px) hue-rotate(0deg);}
-                  100% { filter: blur(2.5px) hue-rotate(360deg);}
-                }
-              `}
-            </style>
-          </div>
-
-          {/* 3rd row: Expense/Income analytics */}
-          <ExpenseTransactions
-            transactions={dashboardData?.last30DaysExpenses?.transactions || []}
-            onSeeMore={() => navigate("/expense")}
-          />
-
-          <Last30DaysExpenses
-            data={dashboardData?.last30DaysExpenses?.transactions || []}
-          />
-
-          <RecentIncomeWithChart
-            data={
-              dashboardData?.last60DaysIncome?.transactions?.slice(0, 4) || []
-            }
-            totalIncome={dashboardData?.totalIncome || 0}
-          />
-
-          <RecentIncome
-            transactions={dashboardData?.last60DaysIncome?.transactions || []}
-            onSeeMore={() => navigate("/income")}
-          />
+          </FadeInCard>
+          <FadeInCard delay={300}>
+            <div
+              className="card transition-transform duration-300"
+              style={cardStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 16px 48px 0 rgba(109,40,217,0.18), 0 4px 24px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)";
+                e.currentTarget.style.transform = "scale(1.022)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+            >
+              <div style={borderStyle} />
+              <div className="flex items-center gap-2 mb-3">
+                <FaBullseye className="text-2xl text-yellow-400" />
+                <span className="text-lg font-semibold text-gray-800">
+                  Financial Goals
+                </span>
+              </div>
+              <GoalsOverview goals={goals} setGoals={setGoals} />
+              <style>
+                {`
+                  @keyframes dashboard-card-border {
+                    0% { filter: blur(2.5px) hue-rotate(0deg);}
+                    100% { filter: blur(2.5px) hue-rotate(360deg);}
+                  }
+                `}
+              </style>
+            </div>
+          </FadeInCard>
+          <FadeInCard delay={400}>
+            <ExpenseTransactions
+              transactions={
+                dashboardData?.last30DaysExpenses?.transactions || []
+              }
+              onSeeMore={() => navigate("/expense")}
+            />
+          </FadeInCard>
+          <FadeInCard delay={500}>
+            <Last30DaysExpenses
+              data={dashboardData?.last30DaysExpenses?.transactions || []}
+            />
+          </FadeInCard>
+          <FadeInCard delay={600}>
+            <RecentIncomeWithChart
+              data={
+                dashboardData?.last60DaysIncome?.transactions?.slice(0, 4) || []
+              }
+              totalIncome={dashboardData?.totalIncome || 0}
+            />
+          </FadeInCard>
+          <FadeInCard delay={700}>
+            <RecentIncome
+              transactions={dashboardData?.last60DaysIncome?.transactions || []}
+              onSeeMore={() => navigate("/income")}
+            />
+          </FadeInCard>
         </div>
       </div>
       {/* Accessibility: visually hidden live region for toast updates */}

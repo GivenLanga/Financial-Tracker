@@ -16,6 +16,7 @@ import Expense from "./pages/Dashboard/Expense";
 import GoalsOverview from "./components/Dashboard/GoalsOverview";
 import SavingsOverview from "./components/Dashboard/SavingsOverview";
 import DashboardLayout from "./components/Layouts/DashboardLayout";
+import TaxQuest from "./pages/TaxQuest";
 
 const App = () => {
   // State for goals and savings (shared across dashboard and pages)
@@ -81,6 +82,8 @@ const App = () => {
                 </DashboardLayout>
               }
             />
+            {/* Tax Quest Game Mode */}
+            <Route path="/tax-quest" element={<TaxQuest />} />
           </Routes>
         </Router>
 

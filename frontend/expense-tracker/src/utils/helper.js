@@ -1,5 +1,14 @@
 import moment from "moment";
 
+// Utility for formatting numbers with thousands separator
+
+export function addThousandsSeparator(num) {
+  if (num === null || num === undefined) return "0";
+  const n = Number(num);
+  if (isNaN(n)) return "0";
+  return n.toLocaleString("en-ZA");
+}
+
 export const validateEmail = (email) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
@@ -18,17 +27,6 @@ export const getInitials = (name) => {
   return initials.toUpperCase();
 };
 
-export const addThousandsSeparator = (num) => {
-  if (num == null || isNaN(num)) return "";
-
-  const [integerPart, fractionalPart] = num.toString().split(".");
-  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-  return fractionalPart
-    ? `${formattedInteger}.${fractionalPart}`
-    : formattedInteger;
-};
-
 export const prepareExpenseBarChartData = (data = []) => {
   const chartData = data.map((item) => ({
     category: item?.category,
@@ -39,10 +37,12 @@ export const prepareExpenseBarChartData = (data = []) => {
 };
 
 export const prepareIncomeBarChartData = (data = []) => {
-  const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedData = [...data].sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
 
   const chartData = sortedData.map((item) => ({
-    month: moment(item?.date).format('Do MMM'),
+    month: moment(item?.date).format("Do MMM"),
     amount: item?.amount,
     source: item?.source,
   }));
@@ -51,10 +51,12 @@ export const prepareIncomeBarChartData = (data = []) => {
 };
 
 export const prepareExpenseLineChartData = (data = []) => {
-  const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedData = [...data].sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
 
   const chartData = sortedData.map((item) => ({
-    month: moment(item?.date).format('Do MMM'),
+    month: moment(item?.date).format("Do MMM"),
     amount: item?.amount,
     category: item?.category,
   }));

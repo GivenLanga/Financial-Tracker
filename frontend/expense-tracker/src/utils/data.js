@@ -4,6 +4,7 @@ import {
   LuWalletMinimal,
   LuLogOut,
 } from "react-icons/lu";
+import { FaChartLine, FaCoins, FaCalculator } from "react-icons/fa";
 
 export const SIDE_MENU_DATA = [
   {
@@ -24,6 +25,7 @@ export const SIDE_MENU_DATA = [
     icon: LuHandCoins,
     path: "/expense",
   },
+
   {
     id: "06",
     label: "Logout",

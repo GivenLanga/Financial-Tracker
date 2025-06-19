@@ -55,7 +55,12 @@ const TransactionInfoCard = React.memo(
           }}
         >
           {icon ? (
-            <img src={icon} alt={title} className="w-6 h-6" />
+            // If icon is a valid image URL, render as image, else render as emoji or fallback
+            icon.startsWith("http") || icon.startsWith("data:") ? (
+              <img src={icon} alt={title} className="w-6 h-6" />
+            ) : (
+              <span style={{ fontSize: "1.5rem" }}>{icon}</span>
+            )
           ) : (
             <LuUtensils />
           )}
