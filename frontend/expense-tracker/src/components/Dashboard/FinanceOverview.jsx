@@ -62,100 +62,89 @@ const FinanceOverview = ({
 
   return (
     <div
-      className="card transition-transform duration-300"
+      className="card transition-transform duration-300 dashboard-card-hover"
       style={cardStyle}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow =
-          "0 16px 48px 0 rgba(109,40,217,0.18), 0 4px 24px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)";
-        e.currentTarget.style.transform = "scale(1.022)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow =
-          "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)";
-        e.currentTarget.style.transform = "scale(1)";
-      }}
     >
       <div style={borderStyle} />
-      <div className="flex items-center justify-between rounded-xl p-3 mb-2 bg-white">
-        <h5 className="text-lg text-gray-900">Financial Overview</h5>
+      <div className="flex items-center justify-between ">
+        <h5 className="text-lg">Financial Overview</h5>
       </div>
-      <div className="rounded-xl p-3 bg-white">
-        <CustomPieChart
-          data={balanceData}
-          label="Total Balance"
-          totalAmount={`R${totalBalance}`}
-          colors={COLORS}
-          showTextAnchor
-        />
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-600">
-              Budget Usage
-            </span>
-            <span className="text-xs font-semibold text-purple-700">
-              {percent}%
-            </span>
-          </div>
-          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden relative">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${percent}%`,
-                background: "linear-gradient(90deg, #a855f7 0%, #facc15 100%)",
-                boxShadow: "0 1px 6px 0 rgba(168,85,247,0.15)",
-              }}
-            />
-            <div
-              className="absolute top-0 left-0 h-full"
-              style={{
-                width: `${percent}%`,
-                background:
-                  "linear-gradient(120deg, rgba(255,255,255,0.18) 40%, rgba(255,255,255,0.02) 60%)",
-                mixBlendMode: "screen",
-                pointerEvents: "none",
-                animation: "shine-bar 2.5s linear infinite",
-              }}
-            />
-          </div>
-          <style>
-            {`
+
+      <CustomPieChart
+        data={balanceData}
+        label="Total Balance"
+        totalAmount={`R${totalBalance}`}
+        colors={COLORS}
+        showTextAnchor
+      />
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-medium text-gray-600">
+            Budget Usage
+          </span>
+          <span className="text-xs font-semibold text-purple-700">
+            {percent}%
+          </span>
+        </div>
+        <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden relative">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${percent}%`,
+              background: "linear-gradient(90deg, #a855f7 0%, #facc15 100%)",
+              boxShadow: "0 1px 6px 0 rgba(168,85,247,0.15)",
+            }}
+          />
+          <div
+            className="absolute top-0 left-0 h-full"
+            style={{
+              width: `${percent}%`,
+              background:
+                "linear-gradient(120deg, rgba(255,255,255,0.18) 40%, rgba(255,255,255,0.02) 60%)",
+              mixBlendMode: "screen",
+              pointerEvents: "none",
+              animation: "shine-bar 2.5s linear infinite",
+            }}
+          />
+        </div>
+        <style>
+          {`
             @keyframes shine-bar {
               0% { opacity: 0.7; transform: translateX(-100%) skewX(-12deg);}
               60% { opacity: 1; }
               100% { opacity: 0.7; transform: translateX(120%) skewX(-12deg);}
             }
           `}
-          </style>
-          <div className="flex justify-between text-[11px] text-gray-400 mt-1 items-center gap-2">
-            <span>Used: R{used}</span>
-            <span>
-              Budget:{" "}
-              {editing ? (
-                <form onSubmit={handleBudgetSubmit} className="inline">
-                  <input
-                    type="number"
-                    min={1}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="w-20 px-1 py-0.5 rounded border border-gray-300 text-xs"
-                    autoFocus
-                    onBlur={() => setEditing(false)}
-                  />
-                </form>
-              ) : (
-                <span
-                  className="cursor-pointer underline text-purple-700"
-                  title="Click to edit"
-                  onClick={() => {
-                    setEditing(true);
-                    setInputValue(budget);
-                  }}
-                >
-                  R{budget}
-                </span>
-              )}
-            </span>
-          </div>
+        </style>
+        <div className="flex justify-between text-[11px] text-gray-400 mt-1 items-center gap-2">
+          <span>Used: R{used}</span>
+          <span>
+            Budget:{" "}
+            {editing ? (
+              <form onSubmit={handleBudgetSubmit} className="inline">
+                <input
+                  type="number"
+                  min={1}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  className="w-20 px-1 py-0.5 rounded border border-gray-300 text-xs"
+                  autoFocus
+                  onBlur={() => setEditing(false)}
+                />
+              </form>
+            ) : (
+              <span
+                className="cursor-pointer underline text-purple-700"
+                title="Click to edit"
+                onClick={() => {
+                  setEditing(true);
+                  setInputValue(budget);
+                }}
+              >
+                R{budget}
+              </span>
+            )}
+          </span>
         </div>
       </div>
       <style>

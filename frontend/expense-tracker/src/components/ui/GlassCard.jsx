@@ -16,7 +16,8 @@ const GlassCard = ({
       border: "2.5px solid transparent",
       clipPath,
       // 3D effect
-      transform: "perspective(900px) rotateY(-6deg) rotateX(3deg) scale3d(1.01,1.01,1)",
+      transform:
+        "perspective(900px) rotateY(-6deg) rotateX(3deg) scale3d(1.01,1.01,1)",
       transition: "transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s",
       ...style,
     }}
@@ -46,5 +47,4 @@ const GlassCard = ({
   </div>
 );
 
-export default GlassCard;
 export default GlassCard;

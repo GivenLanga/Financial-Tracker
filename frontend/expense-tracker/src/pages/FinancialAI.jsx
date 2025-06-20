@@ -110,6 +110,59 @@ const FinancialAI = ({ mini, onClose }) => {
     }
   }, [messages]);
 
+  // --- Tax Helper Section ---
+  const TAX_BRACKETS = [
+    { upTo: 237100 / 12, rate: 0.18, base: 0, baseTax: 0 },
+    { upTo: 370500 / 12, rate: 0.26, base: 237100 / 12, baseTax: 42678 / 12 },
+    { upTo: 512800 / 12, rate: 0.31, base: 370500 / 12, baseTax: 77362 / 12 },
+    { upTo: 673000 / 12, rate: 0.36, base: 512800 / 12, baseTax: 121475 / 12 },
+    { upTo: 857900 / 12, rate: 0.39, base: 673000 / 12, baseTax: 179147 / 12 },
+    { upTo: 1817000 / 12, rate: 0.41, base: 857900 / 12, baseTax: 251258 / 12 },
+    { upTo: Infinity, rate: 0.45, base: 1817000 / 12, baseTax: 644489 / 12 },
+  ];
+
+  function calculateAnnualTax(income) {
+    let tax = 0;
+    for (let i = 0; i < TAX_BRACKETS.length; i++) {
+      const { upTo, rate, base, baseTax } = TAX_BRACKETS[i];
+      if (income <= upTo * 12) {
+        tax = baseTax * 12 + (income - base * 12) * rate;
+        break;
+      }
+    }
+    tax = tax - 17235;
+    return Math.max(0, tax);
+  }
+
+  function calculateMonthlyTax(monthlyIncome) {
+    const annualIncome = monthlyIncome * 12;
+    const annualTax = calculateAnnualTax(annualIncome);
+    return annualTax / 12;
+  }
+
+  function getTaxEstimate(transactions) {
+    const incomeTx = transactions.filter((t) => t.type === "income");
+    if (incomeTx.length === 0)
+      return { monthly: 0, annual: 0, monthlyIncome: 0 };
+    const months = new Set();
+    incomeTx.forEach((t) => {
+      if (t.date) {
+        const d = new Date(t.date);
+        months.add(`${d.getFullYear()}-${d.getMonth() + 1}`);
+      }
+    });
+    const monthsWithIncome = months.size || 1;
+    const totalIncome = incomeTx.reduce((sum, t) => sum + Number(t.amount), 0);
+    const monthlyIncome = totalIncome / monthsWithIncome;
+    const monthlyTax = calculateMonthlyTax(monthlyIncome);
+    const annualTax = monthlyTax * 12;
+    return {
+      monthly: Math.round(monthlyTax),
+      annual: Math.round(annualTax),
+      monthlyIncome: Math.round(monthlyIncome),
+    };
+  }
+
   // Main AI logic
   const handleSend = (e) => {
     e.preventDefault();
@@ -277,6 +330,87 @@ const FinancialAI = ({ mini, onClose }) => {
           ? `You are ${user.fullName}.`
           : "I don't know your name yet!";
       }
+      // Tax estimate (from TaxQuest logic)
+      else if (
+        q.includes("tax estimate") ||
+        q.includes("tax calculation") ||
+        q.includes("tax summary") ||
+        q.includes("taxes summary") ||
+        q.includes("taxes estimate") ||
+        q.includes("taxes calculation") ||
+        q.includes("tax bill") ||
+        q.includes("how much tax") ||
+        (q.includes("tax") &&
+          (q.includes("pay") ||
+            q.includes("owe") ||
+            q.includes("estimate") ||
+            q.includes("summary")))
+      ) {
+        const tax = getTaxEstimate(transactions);
+        if (tax.monthly === 0) {
+          answer =
+            "I couldn't find any income data to estimate your tax. Please add income transactions.";
+        } else {
+          answer =
+            `Your estimated monthly income is R${addThousandsSeparator(
+              tax.monthlyIncome
+            )}.\n` +
+            `Estimated monthly tax: R${addThousandsSeparator(tax.monthly)}.\n` +
+            `Estimated annual tax: R${addThousandsSeparator(tax.annual)}.\n` +
+            "(Based on 2024 SARS brackets, under 65, primary rebate applied)";
+        }
+      }
+      // Tax: monthly tax only
+      else if (
+        (q.includes("monthly tax") && !q.includes("annual")) ||
+        q.includes("tax per month")
+      ) {
+        const tax = getTaxEstimate(transactions);
+        answer =
+          tax.monthly === 0
+            ? "I couldn't find any income data to estimate your monthly tax."
+            : `Your estimated monthly tax is R${addThousandsSeparator(
+                tax.monthly
+              )}.`;
+      }
+      // Tax: annual tax only
+      else if (
+        (q.includes("annual tax") && !q.includes("monthly")) ||
+        q.includes("tax per year") ||
+        q.includes("yearly tax")
+      ) {
+        const tax = getTaxEstimate(transactions);
+        answer =
+          tax.annual === 0
+            ? "I couldn't find any income data to estimate your annual tax."
+            : `Your estimated annual tax is R${addThousandsSeparator(
+                tax.annual
+              )}.`;
+      }
+      // Tax: monthly income used for tax
+      else if (
+        q.includes("tax income") ||
+        q.includes("income for tax") ||
+        q.includes("taxable income")
+      ) {
+        const tax = getTaxEstimate(transactions);
+        answer =
+          tax.monthlyIncome === 0
+            ? "I couldn't find any income data to estimate your taxable income."
+            : `Your estimated monthly taxable income is R${addThousandsSeparator(
+                tax.monthlyIncome
+              )}.`;
+      }
+      // Tax: explain calculation
+      else if (
+        q.includes("how is my tax calculated") ||
+        q.includes("how do you calculate tax") ||
+        q.includes("tax calculation method")
+      ) {
+        answer =
+          "Your tax is estimated using the 2024 SARS brackets for individuals under 65, applying the primary rebate. The calculation uses your average monthly income from your recorded transactions.";
+      }
+
       // Fallback: try to match category spend
       else {
         // Try to match "spend on X" for any category
@@ -323,7 +457,7 @@ const FinancialAI = ({ mini, onClose }) => {
             <span role="img" aria-label="chatbot" className="text-2xl">
               🤖
             </span>
-            Financial AI
+            S[/]ASH AI
           </span>
           <button
             className="text-gray-400 hover:text-gray-700 text-xl"
@@ -406,7 +540,7 @@ const FinancialAI = ({ mini, onClose }) => {
               <span role="img" aria-label="chatbot" className="text-2xl">
                 🤖
               </span>
-              Financial AI
+              S[/]ASH AI
             </span>
           </div>
           <div className={chatContainer} style={{ maxHeight: 340 }}>

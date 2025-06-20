@@ -34,27 +34,20 @@ const borderStyle = {
 
 const ExpenseTransactions = ({ transactions, onSeeMore }) => (
   <div
-    className="card transition-transform duration-300"
+    className="card transition-transform duration-300 dashboard-card-hover"
     style={cardStyle}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.boxShadow =
-        "0 16px 48px 0 rgba(109,40,217,0.18), 0 4px 24px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)";
-      e.currentTarget.style.transform = "scale(1.022)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.boxShadow =
-        "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)";
-      e.currentTarget.style.transform = "scale(1)";
-    }}
   >
     <div style={borderStyle} />
-    <div className="flex items-center justify-between rounded-xl p-3 mb-2 bg-white">
-      <h5 className="text-lg text-gray-900">Expenses</h5>
+
+    <div className="flex items-center justify-between ">
+      <h5 className="text-lg">Expenses</h5>
+
       <button className="card-btn" onClick={onSeeMore}>
         See All <LuArrowRight className="text-base" />
       </button>
     </div>
-    <div className="mt-6 rounded-xl p-3 bg-white">
+
+    <div className="mt-6">
       {transactions?.slice(0, 5)?.map((expense) => (
         <TransactionInfoCard
           key={expense._id}
@@ -80,5 +73,3 @@ const ExpenseTransactions = ({ transactions, onSeeMore }) => (
 );
 
 export default ExpenseTransactions;
-
-

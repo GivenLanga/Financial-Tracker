@@ -152,15 +152,18 @@ const Income = () => {
 
   return (
     <DashboardLayout activeMenu="Income">
-      <div className="my-5 mx-auto">
-        <div className="grid grid-cols-1 gap-6">
+      <div className="my-5 w-full">
+        {" "}
+        {/* Changed mx-auto to w-full */}
+        <div className="grid grid-cols-1 gap-6 w-full">
+          {" "}
+          {/* Added w-full */}
           <div className="">
             <IncomeOverview
               transactions={incomeData}
               onAddIncome={() => setOpenAddIncomeModal(true)}
             />
           </div>
-
           <IncomeList
             transactions={incomeData}
             onDelete={(id) => {
@@ -169,7 +172,6 @@ const Income = () => {
             onDownload={handleDownloadIncomeDetails}
             onEdit={(income) => setEditIncome(income)}
           />
-
           <Modal
             isOpen={openAddIncomeModal}
             onClose={() => setOpenAddIncomeModal(false)}
@@ -177,7 +179,6 @@ const Income = () => {
           >
             <AddIncomeForm onAddIncome={handleAddIncome} />
           </Modal>
-
           <Modal
             isOpen={!!editIncome}
             onClose={() => setEditIncome(null)}
@@ -189,7 +190,6 @@ const Income = () => {
               isEdit
             />
           </Modal>
-
           <Modal
             isOpen={openDeleteAlert.show}
             onClose={() => setOpenDeleteAlert({ show: false, data: null })}

@@ -17,6 +17,8 @@ import GoalsOverview from "./components/Dashboard/GoalsOverview";
 import SavingsOverview from "./components/Dashboard/SavingsOverview";
 import DashboardLayout from "./components/Layouts/DashboardLayout";
 import TaxQuest from "./pages/TaxQuest";
+import Goals from "./pages/Dashboard/Goals";
+import Savings from "./pages/Dashboard/Savings";
 
 const App = () => {
   // State for goals and savings (shared across dashboard and pages)
@@ -59,31 +61,34 @@ const App = () => {
             />
             <Route path="/income" exact element={<Income />} />
             <Route path="/expense" exact element={<Expense />} />
-            {/* Wrap Goals and Savings in DashboardLayout for persistent sidebar */}
-            <Route
-              path="/goals"
-              element={
-                <DashboardLayout activeMenu="Goals">
-                  <GoalsOverview
-                    goals={goals}
-                    onAddGoal={(g) => setGoals([...goals, g])}
-                  />
-                </DashboardLayout>
-              }
-            />
+            {/* Wrap these in DashboardLayout for consistent sidebar/UX */}
             <Route
               path="/savings"
+              exact
               element={
                 <DashboardLayout activeMenu="Savings">
-                  <SavingsOverview
-                    savings={savings}
-                    onAddSaving={(amt) => setSavings(savings + amt)}
-                  />
+                  <Savings />
                 </DashboardLayout>
               }
             />
-            {/* Tax Quest Game Mode */}
-            <Route path="/tax-quest" element={<TaxQuest />} />
+            <Route
+              path="/goals"
+              exact
+              element={
+                <DashboardLayout activeMenu="Goals">
+                  <Goals goals={goals} setGoals={setGoals} />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/tax-quest"
+              exact
+              element={
+                <DashboardLayout activeMenu="Tax Quest">
+                  <TaxQuest />
+                </DashboardLayout>
+              }
+            />
           </Routes>
         </Router>
 

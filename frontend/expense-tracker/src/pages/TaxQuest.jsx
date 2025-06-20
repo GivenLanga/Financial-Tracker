@@ -1,5 +1,4 @@
 import React, { useMemo, useEffect, useState } from "react";
-import DashboardLayout from "../components/Layouts/DashboardLayout";
 import { useSelector, useDispatch } from "react-redux";
 import {
   FaCalculator,
@@ -115,6 +114,25 @@ function getUpcomingDeadlines(staticDeadlines, userReminders) {
     .slice(0, 5);
 }
 
+// Full dashboard card style (matches dashboard cards)
+const cardStyle = {
+  background: "rgba(255,255,255,0.72)",
+  boxShadow:
+    "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)",
+  border: "none",
+  backdropFilter: "blur(14px)",
+  WebkitBackdropFilter: "blur(14px)",
+  borderRadius: "22px",
+  position: "relative",
+  overflow: "hidden",
+  padding: "2rem",
+  // Optional: mimic dashboard card border effect
+  // You can add a pseudo-element or a div for the conic-gradient border if you want the animated border
+};
+
+const inputClass =
+  "modern-tax-input border-none outline-none rounded-lg px-3 py-2 text-sm shadow focus:ring-2 focus:ring-primary/30 transition placeholder:text-gray-400";
+
 const TimelineRemindersCard = ({
   deadlines,
   onAdd,
@@ -123,91 +141,139 @@ const TimelineRemindersCard = ({
   setNewReminder,
   error,
 }) => (
-  <div className="w-full bg-white rounded-2xl shadow p-6 mt-6 flex flex-col items-stretch overflow-x-auto">
-    <h5 className="font-semibold text-primary mb-4 flex items-center gap-2">
-      <FaInfoCircle className="text-base" />
-      Tax Timeline & Reminders
-    </h5>
-    <div className="w-full overflow-x-auto">
-      <ul className="space-y-2 mb-4 min-w-[340px]">
-        {deadlines.length === 0 && (
-          <li className="text-xs text-gray-400">No upcoming deadlines.</li>
-        )}
-        {deadlines.map((d, idx) => (
-          <li
-            key={d.label + d.date + (d.user ? "-user" : "")}
-            className="flex items-center gap-3 bg-purple-50 border-l-4 border-primary/40 rounded px-3 py-2 min-w-0"
-            style={{ wordBreak: "break-word", overflow: "hidden" }}
-          >
-            <span className="font-bold text-primary whitespace-nowrap">
-              {moment(d.date).format("D MMM YYYY")}
-            </span>
-            <span className="font-medium text-gray-700 truncate max-w-[120px]">
-              {d.label}
-            </span>
-            <span className="text-xs text-gray-500 ml-auto truncate max-w-[120px]">
-              {d.desc}
-            </span>
-            {d.user && (
-              <button
-                className="ml-2 text-red-400 hover:text-red-600 flex-shrink-0"
-                title="Remove reminder"
-                type="button"
-                onClick={() => onDelete(d)}
-              >
-                <FaTrashAlt />
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-    <form
-      className="flex flex-col md:flex-row gap-2 items-center"
-      onSubmit={onAdd}
-      autoComplete="off"
-    >
-      <input
-        className="border rounded px-3 py-2 text-sm flex-1 min-w-0"
-        type="text"
-        placeholder="Reminder label (e.g. 'My Tax Filing')"
-        value={newReminder.label}
-        onChange={(e) =>
-          setNewReminder((r) => ({ ...r, label: e.target.value }))
-        }
-        required
+  <div
+    style={cardStyle}
+    className="w-full mt-6 flex flex-col items-stretch overflow-x-auto relative"
+  >
+    {/* Animated border overlay for card */}
+    <div
+      style={{
+        content: "''",
+        position: "absolute",
+        inset: 0,
+        zIndex: 1,
+        borderRadius: "22px",
+        pointerEvents: "none",
+        background:
+          "conic-gradient(from 180deg at 50% 50%, #a855f7 0%, #facc15 50%, #a855f7 100%)",
+        opacity: 0.18,
+        filter: "blur(2.5px)",
+        animation: "dashboard-card-border 6s linear infinite",
+      }}
+    />
+    <div style={{ position: "relative", zIndex: 2 }}>
+      <h5 className="font-semibold text-primary mb-4 flex items-center gap-2">
+        <FaInfoCircle className="text-base" />
+        Tax Timeline & Reminders
+      </h5>
+      <div className="w-full overflow-x-auto">
+        <ul className="space-y-2 mb-4 min-w-[340px]">
+          {deadlines.length === 0 && (
+            <li className="text-xs text-gray-400">No upcoming deadlines.</li>
+          )}
+          {deadlines.map((d, idx) => (
+            <li
+              key={d.label + d.date + (d.user ? "-user" : "")}
+              className="flex items-center gap-3 bg-purple-50 border-l-4 border-primary/40 rounded px-3 py-2 min-w-0"
+              style={{
+                wordBreak: "break-word",
+                overflow: "hidden",
+                background:
+                  "linear-gradient(90deg, rgba(236,233,254,0.85) 0%, rgba(255,255,255,0.85) 100%)",
+                borderLeft: "4px solid #a855f7",
+              }}
+            >
+              <span className="font-bold text-primary whitespace-nowrap">
+                {moment(d.date).format("D MMM YYYY")}
+              </span>
+              <span className="font-medium text-gray-700 truncate max-w-[120px]">
+                {d.label}
+              </span>
+              <span className="text-xs text-gray-500 ml-auto truncate max-w-[120px]">
+                {d.desc}
+              </span>
+              {d.user && (
+                <button
+                  className="ml-2 text-red-400 hover:text-red-600 flex-shrink-0"
+                  title="Remove reminder"
+                  type="button"
+                  onClick={() => onDelete(d)}
+                >
+                  <FaTrashAlt />
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <form
+        className="flex flex-col md:flex-row gap-2 items-center"
+        onSubmit={onAdd}
         autoComplete="off"
-      />
-      <input
-        className="border rounded px-3 py-2 text-sm flex-1 min-w-0"
-        type="date"
-        value={newReminder.date}
-        onChange={(e) =>
-          setNewReminder((r) => ({ ...r, date: e.target.value }))
-        }
-        required
-        autoComplete="off"
-      />
-      <input
-        className="border rounded px-3 py-2 text-sm flex-1 min-w-0"
-        type="text"
-        placeholder="Description"
-        value={newReminder.desc}
-        onChange={(e) =>
-          setNewReminder((r) => ({ ...r, desc: e.target.value }))
-        }
-        autoComplete="off"
-      />
-      <button
-        type="submit"
-        className="flex items-center gap-1 px-3 py-2 rounded bg-primary text-white text-xs font-semibold shadow hover:bg-purple-700 transition flex-shrink-0"
-        title="Add reminder"
       >
-        <FaPlus />
-        Add
-      </button>
-    </form>
-    {error && <div className="text-xs text-red-500 mt-1">{error}</div>}
+        <input
+          className={inputClass + " flex-1 w-full"}
+          type="text"
+          placeholder="Reminder label (e.g. 'My Tax Filing')"
+          value={newReminder.label}
+          onChange={(e) =>
+            setNewReminder((r) => ({ ...r, label: e.target.value }))
+          }
+          required
+          autoComplete="off"
+        />
+        <input
+          className={inputClass + " flex-1 w-full"}
+          type="date"
+          value={newReminder.date}
+          onChange={(e) =>
+            setNewReminder((r) => ({ ...r, date: e.target.value }))
+          }
+          required
+          autoComplete="off"
+        />
+        <input
+          className={inputClass + " flex-1 w-full"}
+          type="text"
+          placeholder="Description"
+          value={newReminder.desc}
+          onChange={(e) =>
+            setNewReminder((r) => ({ ...r, desc: e.target.value }))
+          }
+          autoComplete="off"
+        />
+        <button
+          type="submit"
+          className="flex items-center gap-1 px-3 py-2 rounded bg-primary text-white text-xs font-semibold shadow hover:bg-purple-700 transition flex-shrink-0"
+          title="Add reminder"
+        >
+          <FaPlus />
+          Add
+        </button>
+      </form>
+      {error && <div className="text-xs text-red-500 mt-1">{error}</div>}
+    </div>
+    <style>
+      {`
+        .modern-tax-input {
+          background: rgba(248,250,252,0.95);
+          border: 1.5px solid #a855f71a;
+          color: #3b0764;
+          font-weight: 500;
+          box-shadow: 0 1.5px 6px 0 #a855f71a;
+          transition: border 0.18s, box-shadow 0.18s, background 0.18s;
+        }
+        .modern-tax-input:focus {
+          border: 1.5px solid #a855f7;
+          background: #fff;
+          box-shadow: 0 2px 8px 0 #a855f733;
+        }
+        .modern-tax-input::placeholder {
+          color: #a78bfa;
+          opacity: 1;
+        }
+      `}
+    </style>
   </div>
 );
 
@@ -355,18 +421,66 @@ const TaxQuest = () => {
 
   // --- Layout similar to Dashboard ---
   return (
-    <DashboardLayout activeMenu="Tax Quest">
-      <div className="flex flex-col md:flex-row gap-8 justify-center min-h-[70vh] mt-8">
-        {/* Left: Tax Estimator Card */}
-        <div className="flex-1 max-w-xl flex flex-col">
-          <div className="rounded-2xl shadow-xl bg-white/95 border border-primary/20 p-0 overflow-hidden">
-            <div className="flex items-center gap-3 px-6 py-6 border-b bg-gradient-to-r from-primary/10 to-purple-100">
-              <FaCalculator className="text-2xl text-primary" />
-              <span className="font-bold text-lg text-primary">
+    <div className="flex flex-col gap-8 justify-center min-h-[70vh] mt-8">
+      {/* Top: Two cards side by side, both fill available width equally */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full flex-1">
+        {/* South African Tax Estimator */}
+        <div className="flex flex-col h-full">
+          <div
+            style={{
+              ...cardStyle,
+              background:
+                "linear-gradient(120deg, #f3e8ff 0%, #ede9fe 60%, #fff 100%)",
+              boxShadow:
+                "0 8px 32px 0 rgba(139,92,246,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px #a855f733",
+              border: "1.5px solid #a855f71a",
+              borderRadius: "26px",
+              padding: "2.2rem 2rem",
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              maxWidth: "100%",
+            }}
+            className="h-full flex flex-col justify-between"
+          >
+            {/* Decorative accent */}
+            <div
+              style={{
+                position: "absolute",
+                top: "-50px",
+                right: "-50px",
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, #a855f7 0%, #f3e8ff 80%, transparent 100%)",
+                opacity: 0.13,
+                zIndex: 1,
+                filter: "blur(2px)",
+              }}
+            />
+            <div
+              className="flex items-center gap-3 pb-4 border-b bg-gradient-to-r from-primary/10 to-purple-100"
+              style={{
+                margin: "-2rem",
+                marginBottom: "2rem",
+                borderRadius: "22px 22px 0 0",
+                padding: "2rem",
+                position: "relative",
+                zIndex: 2,
+                borderBottom: "1.5px solid #a855f733",
+                boxShadow: "0 2px 8px 0 #a855f71a",
+              }}
+            >
+              <FaCalculator className="text-2xl text-primary drop-shadow" />
+              <span className="font-bold text-lg text-primary tracking-tight drop-shadow">
                 South African Tax Estimator
               </span>
             </div>
-            <div className="px-6 py-6 flex flex-col gap-4">
+            <div
+              className="flex flex-col gap-4"
+              style={{ position: "relative", zIndex: 2 }}
+            >
               {loading ? (
                 <div className="text-center text-gray-500 py-8">
                   Loading your transactions...
@@ -413,27 +527,79 @@ const TaxQuest = () => {
               )}
             </div>
           </div>
-          {/* Timeline & Reminders Card */}
-          <TimelineRemindersCard
-            deadlines={upcomingDeadlines}
-            onAdd={handleAddReminder}
-            onDelete={handleDeleteReminder}
-            newReminder={newReminder}
-            setNewReminder={setNewReminder}
-            error={error}
-          />
         </div>
-        {/* Right: Pie Chart only */}
-        <div className="flex-1 flex flex-col gap-8 items-center max-w-xl justify-center">
-          <div className="w-full bg-white rounded-2xl shadow p-6 flex flex-col items-center">
-            <h5 className="font-semibold text-primary mb-4 text-center">
+        {/* Net Income vs Tax Pie Chart */}
+        <div className="flex flex-col h-full">
+          <div
+            style={{ ...cardStyle, width: "100%", maxWidth: "100%" }}
+            className="w-full flex flex-col items-center h-full justify-center"
+          >
+            <div
+              style={{
+                content: "''",
+                position: "absolute",
+                inset: 0,
+                zIndex: 1,
+                borderRadius: "22px",
+                pointerEvents: "none",
+                background:
+                  "conic-gradient(from 180deg at 50% 50%, #a855f7 0%, #facc15 50%, #a855f7 100%)",
+                opacity: 0.18,
+                filter: "blur(2.5px)",
+                animation: "dashboard-card-border 6s linear infinite",
+              }}
+            />
+            <h5
+              className="font-semibold text-primary mb-4 text-center"
+              style={{ position: "relative", zIndex: 2 }}
+            >
               Net Income vs Tax
             </h5>
-            <Pie data={pieData} options={pieOptions} width={220} height={220} />
+            <div
+              style={{
+                position: "relative",
+                zIndex: 2,
+                width: 220,
+                height: 220,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 220,
+                minHeight: 220,
+                maxWidth: 220,
+                maxHeight: 220,
+              }}
+            >
+              <Pie
+                data={pieData}
+                options={pieOptions}
+                width={220}
+                height={220}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </DashboardLayout>
+      {/* Bottom: Timeline & Reminders fills remaining width */}
+      <div className="w-full">
+        <TimelineRemindersCard
+          deadlines={upcomingDeadlines}
+          onAdd={handleAddReminder}
+          onDelete={handleDeleteReminder}
+          newReminder={newReminder}
+          setNewReminder={setNewReminder}
+          error={error}
+        />
+      </div>
+      <style>
+        {`
+          @keyframes dashboard-card-border {
+            0% { filter: blur(2.5px) hue-rotate(0deg);}
+            100% { filter: blur(2.5px) hue-rotate(360deg);}
+          }
+        `}
+      </style>
+    </div>
   );
 };
 

@@ -159,7 +159,9 @@ const Home = ({ goals, setGoals, savings, setSavings }) => {
 
   return (
     <DashboardLayout activeMenu="Dashboard">
-      <div className="my-5 mx-auto">
+      <div className="my-5 w-full">
+        {" "}
+        {/* Changed mx-auto to w-full */}
         {/* Greeting and avatar */}
         <FadeInCard delay={0}>
           <div className="flex items-center gap-3 mb-6">
@@ -176,7 +178,6 @@ const Home = ({ goals, setGoals, savings, setSavings }) => {
             </div>
           </div>
         </FadeInCard>
-
         {/* Financial Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
@@ -247,7 +248,6 @@ const Home = ({ goals, setGoals, savings, setSavings }) => {
             </div>
           ))}
         </div>
-
         {/* Main dashboard grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <FadeInCard delay={0}>
@@ -287,23 +287,10 @@ const Home = ({ goals, setGoals, savings, setSavings }) => {
               </div>
               <SavingsOverview
                 savings={savings}
-                onAddSaving={(amt) => setSavings(savings + amt)}
+                onAddSaving={
+                  setSavings ? (amt) => setSavings(savings + amt) : undefined
+                }
               />
-              {savings === 0 && (
-                <EmptyState
-                  icon={<FaPiggyBank />}
-                  title="No savings yet"
-                  subtitle="Start saving to see your progress here."
-                />
-              )}
-              <style>
-                {`
-                  @keyframes dashboard-card-border {
-                    0% { filter: blur(2.5px) hue-rotate(0deg);}
-                    100% { filter: blur(2.5px) hue-rotate(360deg);}
-                  }
-                `}
-              </style>
             </div>
           </FadeInCard>
           <FadeInCard delay={300}>
