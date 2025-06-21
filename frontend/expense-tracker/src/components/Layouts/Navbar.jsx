@@ -137,31 +137,83 @@ const Navbar = ({ activeMenu }) => {
   const [showBot, setShowBot] = useState(false);
 
   return (
-    <div className="flex gap-5 bg-white border boredr-b border-gray-200/50 backdrop-blur-[2px] py-4 px-7 sticky top-0 z-30">
-      <h2 className="text-lg font-medium text-black flex-grow">
+    <div
+      className="flex gap-5 items-center sticky top-0 z-30"
+      style={{
+        background: "rgba(255,255,255,0.72)",
+        boxShadow:
+          "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)",
+        borderBottom: "2.5px solid rgba(168,85,247,0.13)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+        borderRadius: "0", // squared nav only
+        minHeight: 61,
+        padding: "1.1rem 2.2rem 1.1rem 2.2rem",
+        position: "sticky",
+        top: 0,
+      }}
+    >
+      <h2
+        className="text-lg font-extrabold tracking-tight flex-grow"
+        style={{
+          background: "linear-gradient(90deg, #a855f7 20%, #facc15 80%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          letterSpacing: "0.01em",
+          fontFamily: "inherit",
+        }}
+      >
         Expense Tracker
       </h2>
       {/* FinancialAI mini widget, opens on click */}
       <div className="relative ml-4">
         <button
-          className="rounded-full bg-primary text-white w-10 h-10 flex items-center justify-center shadow hover:bg-purple-700 transition"
+          className="rounded-none bg-primary text-white w-10 h-10 flex items-center justify-center shadow-lg hover:bg-purple-700 transition"
           onClick={() => setShowBot((v) => !v)}
           aria-label="Open chatbot"
+          style={{
+            boxShadow: "0 2px 8px 0 #a855f7bb, 0 1.5px 6px 0 #6366f180",
+            border: "2px solid #a855f7",
+            borderRadius: "0", // squared button only
+          }}
         >
-          <span role="img" aria-label="chatbot">
+          <span role="img" aria-label="chatbot" className="text-2xl">
             🤖
           </span>
         </button>
         {showBot && (
-          <div className="absolute right-0 mt-2 z-50">
+          <div
+            className="absolute right-0 mt-2 z-50 animate-slide-in-glass"
+            // Do NOT set borderRadius here, let FinancialAI handle its own style
+            style={{
+              minWidth: 320,
+              maxWidth: 340,
+              overflow: "hidden",
+              boxShadow:
+                "0 8px 32px 0 rgba(109,40,217,0.18), 0 2px 16px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)",
+              background: "rgba(255,255,255,0.72)",
+              border: "2.5px solid rgba(168,85,247,0.13)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              position: "absolute",
+              top: "48px",
+              right: 0,
+            }}
+          >
             <FinancialAI mini onClose={() => setShowBot(false)} />
           </div>
         )}
       </div>
       <button
-        className="block lg:hidden text-black"
+        className="block lg:hidden text-black ml-2"
         onClick={() => {
           setOpenSideMenu(!openSideMenu);
+        }}
+        style={{
+          background: "rgba(255,255,255,0.55)",
+          borderRadius: "0", // squared hamburger
+          padding: "0.4rem",
+          border: "1.5px solid rgba(168,85,247,0.10)",
         }}
       >
         {openSideMenu ? (
@@ -170,12 +222,36 @@ const Navbar = ({ activeMenu }) => {
           <HiOutlineMenu className="text-2xl" />
         )}
       </button>
-
       {openSideMenu && (
-        <div className="fixed top-[61px] right-0 bg-white">
+        <div className="fixed top-[61px] right-0 bg-white z-40">
           <SideMenu activeMenu={activeMenu} />
         </div>
       )}
+      {/* Sliding glass animation style */}
+      <style>
+        {`
+          @keyframes slide-in-glass {
+            0% {
+              opacity: 0;
+              transform: translateY(-32px) scale(0.98) blur(4px);
+              filter: blur(6px);
+            }
+            60% {
+              opacity: 1;
+              transform: translateY(6px) scale(1.02) blur(0.5px);
+              filter: blur(1.5px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0) scale(1) blur(0);
+              filter: blur(0);
+            }
+          }
+          .animate-slide-in-glass {
+            animation: slide-in-glass 0.38s cubic-bezier(.4,0,.2,1);
+          }
+        `}
+      </style>
     </div>
   );
 };

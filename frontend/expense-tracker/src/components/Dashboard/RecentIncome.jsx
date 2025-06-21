@@ -34,8 +34,18 @@ const borderStyle = {
 
 const RecentIncome = ({ transactions, onSeeMore }) => (
   <div
-    className="card transition-transform duration-300 dashboard-card-hover"
+    className="card transition-transform duration-300"
     style={cardStyle}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.boxShadow =
+        "0 16px 48px 0 rgba(109,40,217,0.18), 0 4px 24px 0 rgba(30,0,60,0.13), 0 0 0 3.5px rgba(168,85,247,0.18)";
+      e.currentTarget.style.transform = "scale(1.022)";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.boxShadow =
+        "0 8px 32px 0 rgba(109,40,217,0.13), 0 2px 16px 0 rgba(30,0,60,0.10), 0 0 0 2.5px rgba(168,85,247,0.12)";
+      e.currentTarget.style.transform = "scale(1)";
+    }}
   >
     <div style={borderStyle} />
     <div className="flex items-center justify-between ">
