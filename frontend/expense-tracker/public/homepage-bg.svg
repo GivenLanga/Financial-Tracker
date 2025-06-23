@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1256px" height="1032px" viewBox="0 0 1256 1032" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>@2xImage / homepage-bg</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="1390" height="1029"></rect>
+    </defs>
+    <g id="Image-/-homepage-bg" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Rectangle" transform="translate(-132.000000, 0.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Mask"></g>
+            <path d="M1301.34396,-226.343955 C1433.54835,-91.3697898 1432.42746,124.884634 1298.831,258.481093 L707.968135,849.343955 C576.162041,981.150049 362.462139,981.150049 230.656045,849.343955 C98.6708892,717.358799 98.1739159,503.522352 229.544161,370.925137 L822.642499,-227.712615 C953.240188,-359.53006 1165.96969,-360.518866 1297.78713,-229.921177 C1298.98167,-228.737687 1300.16732,-227.545246 1301.34396,-226.343955 Z" fill="#00DBEB" mask="url(#mask-2)"></path>
+        </g>
+    </g>
+</svg>
