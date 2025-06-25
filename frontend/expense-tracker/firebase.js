@@ -5,15 +5,13 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAZ04svVxdvDcnC7ozBmWu-Ggc2EOsVBLY",
-  authDomain: "expense-tracker-7fda1.firebaseapp.com",
-  projectId: "expense-tracker-7fda1",
-  storageBucket: "expense-tracker-7fda1.appspot.com",
-  messagingSenderId: "1033310260483",
-  appId: "1:1033310260483:web:ca6f683871dd3c8d696d36",
+  apiKey: "AIzaSyDG7IEXnMXyKyqeiDw3kh8y8sD2TNzFwqo",
+  authDomain: "budgetapp-b4aff.firebaseapp.com",
+  projectId: "budgetapp-b4aff",
+  storageBucket: "budgetapp-b4aff.firebasestorage.app",
+  messagingSenderId: "373700687044",
+  appId: "1:373700687044:web:1dffdb6f378e55dcc20591",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-export default app;
