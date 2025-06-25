@@ -1,8 +1,7 @@
 import axios from "axios";
-import { BASE_URL } from "./apiPaths";
 
-const axiosInstance = axios.create({
-  baseURL: BASE_URL,
+const instance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -11,7 +10,7 @@ const axiosInstance = axios.create({
 });
 
 // Request Interceptor
-axiosInstance.interceptors.request.use(
+instance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("token");
     if (accessToken) {
@@ -25,7 +24,7 @@ axiosInstance.interceptors.request.use(
 );
 
 // Response Interceptor
-axiosInstance.interceptors.response.use(
+instance.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -45,4 +44,4 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export default axiosInstance;
+export default instance;
